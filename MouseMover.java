@@ -16,8 +16,8 @@ public class MouseMover {
             Point point = MouseInfo.getPointerInfo().getLocation();
             //Double pointx = point.getX();
             //Double pointy = point.getY();
-            Double pointx = 870.0;
-            Double pointy = 420.0;
+            Double pointx = 1124.0;
+            Double pointy = 430.0;
 
             System.out.println("mouse location:("+pointx+","+pointy+")");
 
