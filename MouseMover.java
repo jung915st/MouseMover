@@ -10,7 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
+//ToDo: add function to let user setup delay timer
 public class MouseMover {
 
     private static boolean running = false;
@@ -27,6 +27,7 @@ public class MouseMover {
 
         JLabel statusLabel = new JLabel("Double-click anywhere to set click position.");
         JPanel buttonPanel = new JPanel();
+        JLabel infoLabel = new JLabel("move this window onto the position you wish to set");
 
         JButton startButton = new JButton("Start Clicking");
         JButton stopButton = new JButton("Stop Clicking");
@@ -34,7 +35,8 @@ public class MouseMover {
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
 
-        frame.add(statusLabel, BorderLayout.NORTH);
+        frame.add(infoLabel, BorderLayout.NORTH);
+        frame.add(statusLabel, BorderLayout.CENTER);
         frame.add(buttonPanel, BorderLayout.SOUTH);
 
         // Mouse adapter for double click to set position
