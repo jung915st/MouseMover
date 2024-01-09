@@ -1,31 +1,31 @@
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
-import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class MouseMover {
-
+public class MoveMouse {
     private static boolean running = false;
-    private static int clickX = 0;
-    private static int clickY = 0;
-    private static final int CLICK_DELAY = 5000; // Click every 10 seconds
+    private static Point clickPoint = new Point(0, 0);
+    private static final int CLICK_DELAY = 10000; // Click every 10 seconds
     private static Robot robot;
 
-    public MouseMover() {
+    public MoveMouse() {
         // Setup the UI
         JFrame frame = new JFrame("Mouse Clicker");
         frame.setLayout(new BorderLayout());
         frame.setSize(300, 150);
 
-        JLabel statusLabel = new JLabel("Double-click anywhere to set click position.");
+        JLabel instructionLabel = new JLabel("Click on this window to set the click position.");
+        JLabel statusLabel = new JLabel("Click position not set.");
         JPanel buttonPanel = new JPanel();
 
         JButton startButton = new JButton("Start Clicking");
@@ -34,18 +34,17 @@ public class MouseMover {
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
 
-        frame.add(statusLabel, BorderLayout.NORTH);
+        frame.add(instructionLabel, BorderLayout.NORTH);
+        frame.add(statusLabel, BorderLayout.CENTER);
         frame.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Mouse adapter for double click to set position
+        // Mouse listener to capture click position outside of buttons
         frame.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    clickX = MouseInfo.getPointerInfo().getLocation().x;
-                    clickY = MouseInfo.getPointerInfo().getLocation().y;
-                    statusLabel.setText("Click position set to: [" + clickX + ", " + clickY + "]");
-                    System.out.println("mouse position: "+clickX+","+clickY);
+            public void mouseClicked(MouseEvent e) {
+                if (!isClickOnButton(frame, e)) {
+                    clickPoint = e.getPoint();
+                    statusLabel.setText("Click position set to: " + clickPoint);
                 }
             }
         });
@@ -71,7 +70,7 @@ public class MouseMover {
 
         // Initialize robot for control
         try {
-            robot = new Robot();
+            robot = a new Robot();
         } catch (AWTException e) {
             e.printStackTrace();
         }
@@ -80,12 +79,9 @@ public class MouseMover {
     private void startClicking() {
         Thread clickerThread = new Thread(() -> {
             while (running) {
-                robot.mouseMove(clickX, clickY);
-                Integer clickx = clickX;
-                Integer clicky = clickY;
+                robot.mouseMove(clickPoint.x, clickPoint.y);
                 robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
                 robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-                System.out.println("coordinate: "+clickx+","+clicky);
                 try {
                     Thread.sleep(CLICK_DELAY);
                 } catch (InterruptedException e) {
@@ -100,7 +96,11 @@ public class MouseMover {
         running = false;
     }
 
+    private boolean isClickOnButton(JFrame frame, MouseEvent e) {
+        return frame.getContentPane().getComponentAt(e.getPoint()) instanceof JButton;
+    }
+
     public static void main(String[] args) {
-        new MouseMover();
+        new MoveMouse();
     }
 }
