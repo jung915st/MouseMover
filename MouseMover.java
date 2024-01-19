@@ -9,7 +9,9 @@ import java.awt.event.MouseAdapter;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 //ToDo: add function to let user setup delay timer
 public class MouseMover {
 
@@ -23,11 +25,18 @@ public class MouseMover {
         // Setup the UI
         JFrame frame = new JFrame("Mouse Clicker");
         frame.setLayout(new BorderLayout());
-        frame.setSize(300, 150);
+        frame.setSize(400, 200);
 
+        JPanel timepanel = new JPanel();
+        JLabel timelabel = new JLabel("Enter time interval in seconds:");
+        timepanel.add(timelabel);
+        JTextField timeInput = new JTextField(5);
+        timepanel.add(timeInput);
+        String labeltext ="<html>move this window onto the position you wish,<br>Double-click anywhere to set click position.</html>";
         JLabel statusLabel = new JLabel("Double-click anywhere to set click position.");
         JPanel buttonPanel = new JPanel();
-        JLabel infoLabel = new JLabel("move this window onto the position you wish to set");
+        JLabel infoLabel = new JLabel(labeltext);
+
 
         JButton startButton = new JButton("Start Clicking");
         JButton stopButton = new JButton("Stop Clicking");
@@ -36,8 +45,9 @@ public class MouseMover {
         buttonPanel.add(stopButton);
 
         frame.add(infoLabel, BorderLayout.NORTH);
-        frame.add(statusLabel, BorderLayout.CENTER);
+        //frame.add(statusLabel, BorderLayout.CENTER);
         frame.add(buttonPanel, BorderLayout.SOUTH);
+        frame.add(timepanel, BorderLayout.CENTER);
 
         // Mouse adapter for double click to set position
         frame.addMouseListener(new MouseAdapter() {
@@ -46,7 +56,7 @@ public class MouseMover {
                 if (e.getClickCount() == 2) {
                     clickX = MouseInfo.getPointerInfo().getLocation().x;
                     clickY = MouseInfo.getPointerInfo().getLocation().y;
-                    statusLabel.setText("Click position set to: [" + clickX + ", " + clickY + "]");
+                    infoLabel.setText("Click position set to: [" + clickX + ", " + clickY + "]");
                     System.out.println("mouse position: "+clickX+","+clickY);
                 }
             }
@@ -54,9 +64,16 @@ public class MouseMover {
 
         // Start button action listener
         startButton.addActionListener(e -> {
-            if (!running) {
-                running = true;
-                startClicking();
+            try {
+                int timeInterval = Integer.parseInt(timeInput.getText());
+                if (timeInterval > 0 && !running) {
+                    running = true;
+                    startClicking(timeInterval);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Please enter a positive integer.");
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, "Please enter a valid integer.");
             }
         });
 
@@ -79,7 +96,7 @@ public class MouseMover {
         }
     }
 
-    private void startClicking() {
+    private void startClicking(int interval) {
         Thread clickerThread = new Thread(() -> {
             while (running) {
                 robot.mouseMove(clickX, clickY);
@@ -89,7 +106,7 @@ public class MouseMover {
                 robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
                 System.out.println("coordinate: "+clickx+","+clicky);
                 try {
-                    Thread.sleep(CLICK_DELAY);
+                    Thread.sleep((long) interval*1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
